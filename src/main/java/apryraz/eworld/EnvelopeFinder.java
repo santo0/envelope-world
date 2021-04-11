@@ -24,6 +24,8 @@ import org.sat4j.specs.*;
 import org.sat4j.minisat.*;
 import org.sat4j.reader.*;
 
+import javax.sound.midi.SysexMessage;
+
 
 /**
  * This agent performs a sequence of movements, and after each
@@ -77,11 +79,14 @@ public class EnvelopeFinder {
      **/
     int EnvelopePastOffset;
     int EnvelopeFutureOffset;
-    int DetectorOneOffset;
-    int DetectorTwoOffset;
-    int DetectorThreeOffset;
-    int DetectorFourOffset;
-    int DetectorFiveOffset;
+    int PastToFutureOffset;
+    int DetectorOffset;
+
+    //int DetectorOneOffset;
+    //int DetectorTwoOffset;
+    //int DetectorThreeOffset;
+    //int DetectorFourOffset;
+    //int DetectorFiveOffset;
     int actualLiteral;
 
 
@@ -254,8 +259,8 @@ public class EnvelopeFinder {
             agentX = Integer.parseInt(moveans.getComp(1));
             agentY = Integer.parseInt(moveans.getComp(2));
 
-            //System.out.println("FINDER => moved to : (" + agentX + "," + agentY + ")" + " Pirate found : "+pirateFound );
-            //TODO: Error aqui
+            System.out.println("FINDER => moved to : (" + agentX + "," + agentY + ")");
+            efstate.set(agentX, agentY, "X");
         }
     }
 
@@ -291,7 +296,38 @@ public class EnvelopeFinder {
 
         int x = Integer.parseInt(ans.getComp(1));
         int y = Integer.parseInt(ans.getComp(2));
-        String detects = ans.getComp(0);
+        String detectorValue = ans.getComp(0);
+        System.out.println(detectorValue);
+        for (int i = 0; i < detectorValue.length(); i++) {
+            char reading = detectorValue.charAt(i);
+
+            if (reading == '1') {
+                switch (i) {
+                    case 0:
+                        System.out.println("ESTA A LA DRETA");
+                        break;
+                    case 1:
+                        System.out.println("ESTA ADALT");
+                        break;
+                    case 2:
+                        System.out.println("ESTA A L'ESQUERRA");
+                        break;
+                    case 3:
+                        System.out.println("ESTA ABAIX");
+                        break;
+                    case 4:
+                        System.out.println("ESTA AQUI");
+                        break;
+                    default:
+                        System.out.println("IMPOSSIBLE");
+
+                }
+            } else if (reading == '0') {
+                System.out.println("NA DE NA");
+            } else {
+                System.out.printf("ERROR: Unknown code (%c)\n", reading);
+            }
+        }
 
         // Call your function/functions to add the evidence clauses
         // to Gamma to then be able to infer new NOT possible positions
@@ -365,9 +401,9 @@ public class EnvelopeFinder {
         // You must set this variable to the total number of boolean variables
         // in your formula Gamma
         /**
-         * nxn de posicions passades + nxn de posicions futures
+         * nxn de posicions passades + nxn de posicions futures + 5 detection sensors
          * */
-        totalNumVariables = WorldLinealDim * 2;
+        totalNumVariables = WorldLinealDim * 2 + 5;
 
         solver = SolverFactory.newDefault();
         solver.setTimeout(3600);
@@ -387,18 +423,58 @@ public class EnvelopeFinder {
         //  Insert the clause into the formula:
         //  solver.addClause(Clause);
 
-        //at least one envelope: e{t-1} s.t. 1,1 to n,n (one clause)
+        //at least one envelope: e{t-1}{i,j} s.t. 1,1 to n,n (one clause)
         pastEnvelope();
-        //at least one envelope: e{t+1} s.t. 1,1 to n,n (one clause)
+        //at least one envelope: e{t+1}{i,j} s.t. 1,1 to n,n (one clause)
         futureEnvelope();
-
+        // no e{t-1}{i,j} -> no e{t+11}{i,j} s.t i,j => 1,1 to n,n (nxn clause)
+        pastToFuture();
+        // detector
+        System.out.println(solver.nVars());
         return solver;
+    }
+
+    void detectPossibleEnvelope() throws ContradictionException {
+        DetectorOffset = actualLiteral;
+        /*
+        DetectorOneOffset = actualLiteral;
+        DetectorTwoOffset = DetectorOneOffset + WorldLinealDim;
+        DetectorThreeOffset = DetectorTwoOffset + WorldLinealDim;
+        DetectorFourOffset = DetectorThreeOffset + WorldLinealDim;
+        DetectorFiveOffset = DetectorFourOffset + WorldLinealDim;
+        */
+        for (int i = 0; i < WorldDim; i++) {
+            for (int j = 0; j < WorldDim; j++) {
+                int[][] read1 = {{i + 1, j - 1}, {i + 1, j}, {i + 1, j + 1}};
+                int[][] read2 = {{i - 1, j + 1}, {i, j + 1}, {i + 1, j + 1}};
+                int[][] read3 = {{i - 1, j - 1}, {i - 1, j}, {i - 1, j + 1}};
+                int[][] read4 = {{i - 1, j - 1}, {i, j - 1}, {i + 1, j - 1}};
+                int[][] read5 = {{i, j}};//Redundancy, but this way is more readable
+                for (int detectorVar=1; detectorVar < 5 + 1; detectorVar++){
+
+                }
+
+
+            }
+        }
+
+    }
+
+    void pastToFuture() throws ContradictionException {
+        //PastToFutureOffset = actualLiteral;
+        VecInt impClause;
+        for (int i = 0; i < WorldLinealDim; i++) {//nxn
+            impClause = new VecInt();
+            impClause.insertFirst(i + 1);
+            impClause.insertFirst(-(i + 1 + EnvelopeFutureOffset));
+            solver.addClause(impClause);
+        }
     }
 
     void pastEnvelope() throws ContradictionException {
         EnvelopePastOffset = actualLiteral;
         VecInt aloClause = new VecInt();
-        for(int i = 0; i < WorldLinealDim; i++){
+        for (int i = 0; i < WorldLinealDim; i++) {
             aloClause.insertFirst(actualLiteral);
             actualLiteral++;
         }
@@ -406,9 +482,10 @@ public class EnvelopeFinder {
     }
 
     void futureEnvelope() throws ContradictionException {
+        //TODO: Segur que aixo faria falta?
         EnvelopeFutureOffset = actualLiteral;
         VecInt aloClause = new VecInt();
-        for(int i = 0; i < WorldLinealDim; i++){
+        for (int i = 0; i < WorldLinealDim; i++) {
             aloClause.insertFirst(actualLiteral);
             actualLiteral++;
         }
