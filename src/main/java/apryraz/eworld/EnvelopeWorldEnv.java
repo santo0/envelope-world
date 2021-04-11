@@ -8,6 +8,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -66,7 +67,7 @@ public class EnvelopeWorldEnv {
         }
         positionList = locations.split(" ");
         envelopesLocations = new LinkedHashSet<>();
-        for(String location: positionList){
+        for (String location : positionList) {
             String[] coords = location.split(",");
             envelopesLocations.add(new Position(Integer.parseInt(coords[0]), Integer.parseInt(coords[1])));
         }
@@ -91,19 +92,47 @@ public class EnvelopeWorldEnv {
             int ny = Integer.parseInt(msg.getComp(2));
 
             if (withinLimits(nx, ny)) {
-
-
                 ans = new AMessage("movedto", msg.getComp(1), msg.getComp(2), "");
             } else
                 ans = new AMessage("notmovedto", msg.getComp(1), msg.getComp(2), "");
 
-        } else {
+        } else if (msg.getComp(0).equals("detectsat")) {
             // YOU MUST ANSWER HERE TO THE OTHER MESSAGE TYPE:
             //   ( "detectsat", "x" , "y", "" )
             //
+            StringBuilder readings = new StringBuilder();
+            for (int i = 0; i < 5; i++) {
+                readings.append(0);
+            }
+            int nx = Integer.parseInt(msg.getComp(1));
+            int ny = Integer.parseInt(msg.getComp(2));
+            Position givenPosition = new Position(nx, ny);
+            for (Position envLoc : envelopesLocations) {
+                if (envLoc.isOnRight(givenPosition)) {
+                    readings.insert(0, 1);
+                }
+                if (envLoc.isOnTop(givenPosition)) {
+                    readings.insert(1, 1);
+                }
+                if (envLoc.isOnLeft(givenPosition)) {
+                    readings.insert(2, 1);
+                }
+                if (envLoc.isOnBot(givenPosition)) {
+                    readings.insert(3, 1);
+                }
+                if (envLoc.isOnSite(givenPosition)) {
+                    readings.insert(4, 1);
+                }
+            }                //It will a message with three fields: DetectorValue x y
+
+            //int encodedValue = Integer.parseInt(readings.toString(), 2);
+            ans = new AMessage(readings.toString(), (msg.getComp(1)), (msg.getComp(2)), "");
+
+        } else {
+            System.out.printf("ERROR: Unknown message type (%s)\n", msg.getComp(0));
+            exit(1);
         }
         return ans;
-
     }
 
 
