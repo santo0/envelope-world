@@ -14,6 +14,10 @@ public class EFState {
         initializeState();
     }
 
+    String getPositionState(int i, int j){
+        return matrix[i - 1][j - 1];
+    }
+
     public void initializeState() {
         for (int i = 0; i < wDim; i++) {
             for (int j = 0; j < wDim; j++) {
@@ -26,7 +30,7 @@ public class EFState {
        we assume i and j are given in the range [1,wDim] */
     public void set(int i, int j, String val) {
 
-        matrix[i - 1][j - 1] = val;
+        matrix[i - 1][j - 1] = "\u001B[32m"+val+"\u001B[0m";
     }
 
     public boolean equals(Object obj) {
@@ -49,6 +53,8 @@ public class EFState {
             System.out.print("\t#\t");
             for (int j = 0; j < wDim; j++) {
                 System.out.print(matrix[i][j] + " ");
+//                System.out.print(matrix[i][j]+ "("+i+","+j+")" + " ");
+
             }
             System.out.println("\t#");
         }

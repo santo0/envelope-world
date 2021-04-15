@@ -14,6 +14,7 @@ import static java.lang.System.exit;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -79,8 +80,12 @@ public class EnvelopeFinder {
      **/
     int EnvelopePastOffset;
     int EnvelopeFutureOffset;
-    int PastToFutureOffset;
-    int DetectorOffset;
+    //int DetectorOffset;
+    int ReadOneOffset;
+    int ReadTwoOffset;
+    int ReadThreeOffset;
+    int ReadFourOffset;
+    int ReadFiveOffset;
 
     //int DetectorOneOffset;
     //int DetectorTwoOffset;
@@ -97,13 +102,14 @@ public class EnvelopeFinder {
      *
      * @param WDim the dimension of the Envelope World
      **/
-    public EnvelopeFinder(int WDim) {
+    public EnvelopeFinder(int WDim, EnvelopeWorldEnv environment) throws IOException {
 
         WorldDim = WDim;
         WorldLinealDim = WorldDim * WorldDim;
-
+        EnvAgent = environment;
         try {
             solver = buildGamma();
+            solver.setVerbose(true);
         } catch (FileNotFoundException ex) {
             Logger.getLogger(EnvelopeFinder.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException | ContradictionException ex) {
@@ -260,7 +266,7 @@ public class EnvelopeFinder {
             agentY = Integer.parseInt(moveans.getComp(2));
 
             System.out.println("FINDER => moved to : (" + agentX + "," + agentY + ")");
-            efstate.set(agentX, agentY, "X");
+            efstate.set(agentX, agentY, efstate.getPositionState(agentX, agentY)); //Per a mirar per on va el agent
         }
     }
 
@@ -297,33 +303,60 @@ public class EnvelopeFinder {
         int x = Integer.parseInt(ans.getComp(1));
         int y = Integer.parseInt(ans.getComp(2));
         String detectorValue = ans.getComp(0);
-        System.out.println(detectorValue);
         for (int i = 0; i < detectorValue.length(); i++) {
             char reading = detectorValue.charAt(i);
 
-            if (reading == '1') {
+            if (reading == '0') {
+                VecInt evidence = new VecInt();
                 switch (i) {
                     case 0:
-                        System.out.println("ESTA A LA DRETA");
+                        System.out.println("NO ESTA A LA DRETA");
+                        evidence.insertFirst(-coordToLineal(x, y, ReadOneOffset));
                         break;
                     case 1:
-                        System.out.println("ESTA ADALT");
+                        System.out.println("NO ESTA ADALT");
+                        evidence.insertFirst(-coordToLineal(x, y, ReadTwoOffset));
                         break;
                     case 2:
-                        System.out.println("ESTA A L'ESQUERRA");
+                        System.out.println("NO ESTA A L'ESQUERRA");
+                        evidence.insertFirst(-coordToLineal(x, y, ReadThreeOffset));
+
                         break;
                     case 3:
-                        System.out.println("ESTA ABAIX");
+                        System.out.println("NO ESTA ABAIX");
+                        evidence.insertFirst(-coordToLineal(x, y, ReadFourOffset));
+
                         break;
                     case 4:
-                        System.out.println("ESTA AQUI");
+                        System.out.println("NO ESTA AQUI");
+                        evidence.insertFirst(-coordToLineal(x, y, ReadFiveOffset));
+                        break;
+                    default:
+                        System.out.println("IMPOSSIBLE");
+                }
+                System.out.printf("Evidence: (%d, %d) %s\n", x, y, evidence);
+                solver.addClause(evidence);
+            } else if (reading == '1') {
+                switch (i) {
+                    case 0:
+                        System.out.println("ESTA A LA DRETA, TODO CORRECTO");
+                        break;
+                    case 1:
+                        System.out.println("ESTA ADALT, TODO CORRECTO");
+                        break;
+                    case 2:
+                        System.out.println("ESTA A L'ESQUERRA, TODO CORRECTO");
+                        break;
+                    case 3:
+                        System.out.println("ESTA ABAIX, TODO CORRECTO");
+                        break;
+                    case 4:
+                        System.out.println("ESTA AQUI, TODO CORRECTO");
                         break;
                     default:
                         System.out.println("IMPOSSIBLE");
 
                 }
-            } else if (reading == '0') {
-                System.out.println("NA DE NA");
             } else {
                 System.out.printf("ERROR: Unknown code (%c)\n", reading);
             }
@@ -348,23 +381,17 @@ public class EnvelopeFinder {
      **/
     public void addLastFutureClausesToPastClauses() throws IOException,
             ContradictionException, TimeoutException {
-
+        if (futureToPast != null) {
+            for (VecInt clause : futureToPast) {
+                solver.addClause(clause);
+            }
+        }
+        futureToPast = new ArrayList<>();
 
     }
 
-    /**
-     * This function should check, using the future variables related
-     * to possible positions of Envelope, whether it is a logical consequence
-     * that an envelope is NOT at certain positions. This should be checked for all the
-     * positions of the Envelope World.
-     * The logical consequences obtained, should be then stored in the futureToPast list
-     * but using the variables corresponding to the "past" variables of the same positions
-     * <p>
-     * An efficient version of this function should try to not add to the futureToPast
-     * conclusions that were already added in previous steps, although this will not produce
-     * any bad functioning in the reasoning process with the formula.
-     **/
-    public void performInferenceQuestions() throws IOException,
+
+  /*  public void dummyPerformInferenceQuestions() throws IOException,
             ContradictionException, TimeoutException {
         // EXAMPLE code to check this for position (2,3):
         // Get variable number for position 2,3 in past variables
@@ -385,7 +412,44 @@ public class EnvelopeFinder {
             futureToPast.add(concPast);
             efstate.set(2, 3, "X");
         }
+    }
+*/
 
+    /**
+     * This function should check, using the future variables related
+     * to possible positions of Envelope, whether it is a logical consequence
+     * that an envelope is NOT at certain positions. This should be checked for all the
+     * positions of the Envelope World.
+     * The logical consequences obtained, should be then stored in the futureToPast list
+     * but using the variables corresponding to the "past" variables of the same positions
+     * <p>
+     * An efficient version of this function should try to not add to the futureToPast
+     * conclusions that were already added in previous steps, although this will not produce
+     * any bad functioning in the reasoning process with the formula.
+     **/
+    public void performInferenceQuestions() throws IOException,
+            ContradictionException, TimeoutException {
+        for (int i = 1; i <= WorldDim; i++) {
+            for (int j = 1; j <= WorldDim; j++) {
+
+                int linealIndex = coordToLineal(i, j, EnvelopeFutureOffset);
+                int linealIndexPast = coordToLineal(i, j, EnvelopePastOffset);
+
+                VecInt variablePositive = new VecInt();
+                variablePositive.insertFirst(linealIndex);
+
+                if (!(solver.isSatisfiable(variablePositive))) {
+                    //System.out.println("Explanation: " + solver.unsatExplanation() + " and " + -linealIndexPast);
+                    System.out.println("Literal to add: " + -linealIndexPast);
+                    VecInt concPast = new VecInt();
+                    concPast.insertFirst(-(linealIndexPast));
+                    System.out.println(Arrays.toString(solver.findModel()));
+                    futureToPast.add(concPast);
+                    efstate.set(i, j, "X");
+
+                }
+            }
+        }
     }
 
     /**
@@ -401,10 +465,11 @@ public class EnvelopeFinder {
         // You must set this variable to the total number of boolean variables
         // in your formula Gamma
         /**
-         * nxn de posicions passades + nxn de posicions futures + 5 detection sensors
+         * nxn de posicions passades + nxn de posicions futures + nxn posicions on reading 1 + nxn posicions on reading 2
+         * + nxn posicions on reading 3 + nxn posicions on reading 4+ nxn posicions on reading 5
          * */
-        totalNumVariables = WorldLinealDim * 2 + 5;
-
+        totalNumVariables = WorldLinealDim * 7; //n*n*7
+        //rd1_i,j{t}
         solver = SolverFactory.newDefault();
         solver.setTimeout(3600);
         solver.newVar(totalNumVariables);
@@ -422,52 +487,163 @@ public class EnvelopeFinder {
         //
         //  Insert the clause into the formula:
         //  solver.addClause(Clause);
-
+        System.out.println("---------------pastEnvelope---------------");
         //at least one envelope: e{t-1}{i,j} s.t. 1,1 to n,n (one clause)
         pastEnvelope();
+        System.out.println("---------------futureEnvelope---------------");
         //at least one envelope: e{t+1}{i,j} s.t. 1,1 to n,n (one clause)
         futureEnvelope();
+        System.out.println("---------------pastToFuture---------------");
         // no e{t-1}{i,j} -> no e{t+11}{i,j} s.t i,j => 1,1 to n,n (nxn clause)
         pastToFuture();
-        // detector
-        System.out.println(solver.nVars());
+        System.out.println("---------------detectPossibleEnvelope---------------");
+        // read1
+        noReadingOneEnvelope();
+        // read2
+        noReadingTwoEnvelope();
+        //read3
+        noReadingThreeEnvelope();
+        //read4
+        noReadingFourEnvelope();
+        //read5
+        noReadingFiveEnvelope();
+        System.out.println(ReadOneOffset);
+        System.out.println(ReadTwoOffset);
+        System.out.println(ReadThreeOffset);
+        System.out.println(ReadFourOffset);
+        System.out.println(ReadFiveOffset);
+
         return solver;
     }
+    // int[][][] reads =   {{{i + 1, j - 1}, {i + 1, j}, {i + 1, j + 1}}, //read1
+    //                     {{i - 1, j + 1}, {i, j + 1}, {i + 1, j + 1}},  //read2
+    //                     {{i - 1, j - 1}, {i - 1, j}, {i - 1, j + 1}},  //read3
+    //                     {{i - 1, j - 1}, {i, j - 1}, {i + 1, j - 1}},  //read4
+    //                     {{i, j}}};                                     //read5
+    ////DetectorOffeset is read1, DetectorOffset + 1 is read2, ..., DetectorOffset + 4 is read5
 
-    void detectPossibleEnvelope() throws ContradictionException {
-        DetectorOffset = actualLiteral;
-        /*
-        DetectorOneOffset = actualLiteral;
-        DetectorTwoOffset = DetectorOneOffset + WorldLinealDim;
-        DetectorThreeOffset = DetectorTwoOffset + WorldLinealDim;
-        DetectorFourOffset = DetectorThreeOffset + WorldLinealDim;
-        DetectorFiveOffset = DetectorFourOffset + WorldLinealDim;
-        */
-        for (int i = 0; i < WorldDim; i++) {
-            for (int j = 0; j < WorldDim; j++) {
-                int[][] read1 = {{i + 1, j - 1}, {i + 1, j}, {i + 1, j + 1}};
-                int[][] read2 = {{i - 1, j + 1}, {i, j + 1}, {i + 1, j + 1}};
-                int[][] read3 = {{i - 1, j - 1}, {i - 1, j}, {i - 1, j + 1}};
-                int[][] read4 = {{i - 1, j - 1}, {i, j - 1}, {i + 1, j - 1}};
-                int[][] read5 = {{i, j}};//Redundancy, but this way is more readable
-                for (int detectorVar=1; detectorVar < 5 + 1; detectorVar++){
-
+    void noReadingOneEnvelope() throws ContradictionException {
+        System.out.println("-------Read 1-------");
+        ReadOneOffset = actualLiteral;
+        for (int i = 1; i <= WorldDim; i++) {
+            for (int j = 1; j <= WorldDim; j++) {
+                System.out.printf("Pos (%d, %d)\n", i, j);
+                int[][] reading = {{i + 1, j - 1}, {i + 1, j}, {i + 1, j + 1}};
+                int detectLiteral = coordToLineal(i, j, ReadOneOffset);
+                for (int k = 0; k < reading.length; k++) {
+                    if (EnvAgent.withinLimits(reading[k][0], reading[k][1])) {
+                        VecInt readClause = new VecInt();
+                        int futureEnvelopeLiteral = coordToLineal(reading[k][0], reading[k][1], EnvelopeFutureOffset);
+                        readClause.insertFirst(-futureEnvelopeLiteral);
+                        readClause.insertFirst(detectLiteral);
+                        System.out.printf("%d %d 0\n", -futureEnvelopeLiteral, detectLiteral);
+                        solver.addClause(readClause);
+                    }
                 }
-
-
+                actualLiteral++;
+                System.out.println("Literal counter: " + actualLiteral);
             }
         }
-
     }
+
+    void noReadingTwoEnvelope() throws ContradictionException {
+        System.out.println("-------Read 2-------");
+        ReadTwoOffset = actualLiteral;
+        for (int i = 1; i <= WorldDim; i++) {
+            for (int j = 1; j <= WorldDim; j++) {
+                System.out.printf("Pos (%d, %d)\n", i, j);
+                int[][] reading = {{i - 1, j + 1}, {i, j + 1}, {i + 1, j + 1}};
+                int detectLiteral = coordToLineal(i, j, ReadTwoOffset);
+                for (int k = 0; k < reading.length; k++) {
+                    if (EnvAgent.withinLimits(reading[k][0], reading[k][1])) {
+                        VecInt readClause = new VecInt();
+                        int futureEnvelopeLiteral = coordToLineal(reading[k][0], reading[k][1], EnvelopeFutureOffset);
+                        readClause.insertFirst(-futureEnvelopeLiteral);
+                        readClause.insertFirst(detectLiteral);
+                        System.out.printf("%d %d 0\n", -futureEnvelopeLiteral, detectLiteral);
+                        solver.addClause(readClause);
+                    }
+                }
+                actualLiteral++;
+            }
+        }
+    }
+
+    void noReadingThreeEnvelope() throws ContradictionException {
+        System.out.println("-------Read 3-------");
+        ReadThreeOffset = actualLiteral;
+        for (int i = 1; i <= WorldDim; i++) {
+            for (int j = 1; j <= WorldDim; j++) {
+                System.out.printf("Pos (%d, %d)\n", i, j);
+                int[][] reading = {{i - 1, j - 1}, {i - 1, j}, {i - 1, j + 1}};
+                int detectLiteral = coordToLineal(i, j, ReadThreeOffset);
+                for (int k = 0; k < reading.length; k++) {
+                    if (EnvAgent.withinLimits(reading[k][0], reading[k][1])) {
+                        VecInt readClause = new VecInt();
+                        int futureEnvelopeLiteral = coordToLineal(reading[k][0], reading[k][1], EnvelopeFutureOffset);
+                        readClause.insertFirst(-futureEnvelopeLiteral);
+                        readClause.insertFirst(detectLiteral);
+                        System.out.printf("%d %d 0\n", -futureEnvelopeLiteral, detectLiteral);
+                        solver.addClause(readClause);
+                    }
+                }
+                actualLiteral++;
+            }
+        }
+    }
+
+    void noReadingFourEnvelope() throws ContradictionException {
+        System.out.println("-------Read 4-------");
+        ReadFourOffset = actualLiteral;
+        for (int i = 1; i <= WorldDim; i++) {
+            for (int j = 1; j <= WorldDim; j++) {
+                System.out.printf("Pos (%d, %d)\n", i, j);
+                int[][] reading = {{i - 1, j - 1}, {i, j - 1}, {i + 1, j - 1}};
+                int detectLiteral = coordToLineal(i, j, ReadFourOffset);
+                for (int k = 0; k < reading.length; k++) {
+                    if (EnvAgent.withinLimits(reading[k][0], reading[k][1])) {
+                        VecInt readClause = new VecInt();
+                        int futureEnvelopeLiteral = coordToLineal(reading[k][0], reading[k][1], EnvelopeFutureOffset);
+                        readClause.insertFirst(-futureEnvelopeLiteral);
+                        readClause.insertFirst(detectLiteral);
+                        System.out.printf("%d %d 0\n", -futureEnvelopeLiteral, detectLiteral);
+                        solver.addClause(readClause);
+                    }
+                }
+                actualLiteral++;
+            }
+        }
+    }
+
+    void noReadingFiveEnvelope() throws ContradictionException {
+        System.out.println("-------Read 5-------");
+        ReadFiveOffset = actualLiteral;
+        for (int i = 1; i <= WorldDim; i++) {
+            for (int j = 1; j <= WorldDim; j++) {
+                System.out.printf("Pos (%d, %d)\n", i, j);
+                VecInt readClause = new VecInt();
+                int detectLiteral = coordToLineal(i, j, ReadFiveOffset);
+                int futureEnvelopeLiteral = coordToLineal(i, j, EnvelopeFutureOffset);
+                readClause.insertFirst(-futureEnvelopeLiteral);
+                readClause.insertFirst(detectLiteral);
+                solver.addClause(readClause);
+                System.out.printf("%d %d 0\n", -futureEnvelopeLiteral, detectLiteral);
+                actualLiteral++;
+            }
+        }
+    }
+
 
     void pastToFuture() throws ContradictionException {
         //PastToFutureOffset = actualLiteral;
         VecInt impClause;
         for (int i = 0; i < WorldLinealDim; i++) {//nxn
             impClause = new VecInt();
-            impClause.insertFirst(i + 1);
-            impClause.insertFirst(-(i + 1 + EnvelopeFutureOffset));
+            impClause.insertFirst(i + EnvelopePastOffset);
+            impClause.insertFirst(-(i + EnvelopeFutureOffset));
             solver.addClause(impClause);
+            System.out.printf("%d %d 0\n", i + EnvelopePastOffset, -(i + EnvelopeFutureOffset));
+
         }
     }
 
@@ -476,8 +652,12 @@ public class EnvelopeFinder {
         VecInt aloClause = new VecInt();
         for (int i = 0; i < WorldLinealDim; i++) {
             aloClause.insertFirst(actualLiteral);
+            System.out.printf("%d ", actualLiteral);
             actualLiteral++;
         }
+
+        System.out.print("0\n");
+
         solver.addClause(aloClause);
     }
 
@@ -487,8 +667,10 @@ public class EnvelopeFinder {
         VecInt aloClause = new VecInt();
         for (int i = 0; i < WorldLinealDim; i++) {
             aloClause.insertFirst(actualLiteral);
+            System.out.printf("%d ", actualLiteral);
             actualLiteral++;
         }
+        System.out.print("0\n");
         solver.addClause(aloClause);
     }
 
