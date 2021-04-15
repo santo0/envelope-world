@@ -108,26 +108,35 @@ public class EnvelopeWorldEnv {
             int ny = Integer.parseInt(msg.getComp(2));
             Position givenPosition = new Position(nx, ny);
             for (Position envLoc : envelopesLocations) {
-                if (envLoc.isOnRight(givenPosition)) {
-                    readings.insert(0, 1);
+                if (givenPosition.isOnRight(envLoc)) {
+                    System.out.printf("ESTA A LA DRETA (%d, %d)\n%n", envLoc.x, envLoc.y);
+                    readings.replace(0, 1, "1");
                 }
-                if (envLoc.isOnTop(givenPosition)) {
-                    readings.insert(1, 1);
+                if (givenPosition.isOnTop(envLoc)) {
+                    System.out.printf("ESTA AL TOP (%d, %d)\n%n", envLoc.x, envLoc.y);
+
+                    readings.replace(1, 2,"1");
                 }
-                if (envLoc.isOnLeft(givenPosition)) {
-                    readings.insert(2, 1);
+                if (givenPosition.isOnLeft(envLoc)) {
+                    System.out.printf("ESTA A LESQUERRA (%d, %d)\n%n", envLoc.x, envLoc.y);
+
+                    readings.replace(2,3, "1");
                 }
-                if (envLoc.isOnBot(givenPosition)) {
-                    readings.insert(3, 1);
+                if (givenPosition.isOnBot(envLoc)) {
+                    System.out.printf("ESTA ABAIX (%d, %d)\n%n", envLoc.x, envLoc.y);
+
+                    readings.replace(3,4, "1");
                 }
-                if (envLoc.isOnSite(givenPosition)) {
-                    readings.insert(4, 1);
+                if (givenPosition.isOnSite(envLoc)) {
+                    System.out.printf("ESTA AL MISMO (%d, %d)\n%n", envLoc.x, envLoc.y);
+
+                    readings.replace(4,5, "1");
                 }
             }                //It will a message with three fields: DetectorValue x y
 
             //int encodedValue = Integer.parseInt(readings.toString(), 2);
             ans = new AMessage(readings.toString(), (msg.getComp(1)), (msg.getComp(2)), "");
-
+            System.out.printf("ANS: %s\n", readings.toString());
         } else {
             System.out.printf("ERROR: Unknown message type (%s)\n", msg.getComp(0));
             exit(1);

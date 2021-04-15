@@ -34,11 +34,11 @@ public class EnvelopeWorld {
         EnvelopeFinder EAgent;
         EnvelopeWorldEnv EnvAgent;
 
-        EAgent = new EnvelopeFinder(wDim);
         EnvAgent = new EnvelopeWorldEnv(wDim, fileEnvelopes);
+        EAgent = new EnvelopeFinder(wDim, EnvAgent);
 
         // save environment object into EAgent
-        EAgent.setEnvironment(EnvAgent);
+        //EAgent.setEnvironment(EnvAgent); //Ja el fico al constructor
 
 
         // load list of steps into the Finder Agent

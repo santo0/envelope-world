@@ -78,8 +78,7 @@ public class EnvelopeFinderTest {
      *                   be the resulting states after each movement in fileSteps
      * @return returns an ArrayList of TFState with the resulting list of states
      **/
-    /*
-    ArrayList<TFState> loadListOfTargetStates(int wDim, int numStates, String statesFile) {
+    ArrayList<EFState> loadListOfTargetStates(int wDim, int numStates, String statesFile) {
 
         ArrayList<EFState> listOfStates = new ArrayList<EFState>(numStates);
 
@@ -103,7 +102,7 @@ public class EnvelopeFinderTest {
         }
 
         return listOfStates;
-    }*/
+    }
 
 
     /**
@@ -117,7 +116,6 @@ public class EnvelopeFinderTest {
      *                      be the resulting states after each movement in fileSteps
      * @param fileEnvelopes
      **/
-    /*
     public void testMakeSeqOfSteps(int wDim,
                                    int numSteps, String fileSteps, String fileStates,
                                    String fileEnvelopes)
@@ -130,6 +128,8 @@ public class EnvelopeFinderTest {
         EnvelopeWorldEnv envAgent;
         // Load list of states
         ArrayList<EFState> seqOfStates;
+        envAgent = new EnvelopeWorldEnv(wDim, fileEnvelopes);
+        eAgent = new EnvelopeFinder(wDim, envAgent);
 
 
         // Set environment agent and load list of steps into the finder agent
@@ -138,20 +138,17 @@ public class EnvelopeFinderTest {
 
         // Test here the sequence of steps and check the resulting states with the
         // ones in seqOfStates
-    }*/
+    }
 
     /**
      * This is an example test. You must replicate this method for each different
      * test sequence, or use some kind of parametric tests with junit
      **/
-    /*
     @Test
     public void TWorldTest1() throws
             IOException, ContradictionException, TimeoutException {
         // Example test for 4x4 world , Treasure at 3,3 and 5 steps
         testMakeSeqOfSteps(4, 5, "tests/steps1.txt", "tests/states1.txt", "tests/envelopes1.txt");
-    }*/
+    }
 
 }
-
-//TODO: Hi han moltes coses comentades per que donaven error, descomentarles i corretgirles
