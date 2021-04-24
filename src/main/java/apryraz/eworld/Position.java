@@ -1,10 +1,8 @@
 package apryraz.eworld;
 
-import java.util.Objects;
-
 public class Position {
     /**
-     *
+     * Position of EnvelopeWorldEnv
      **/
     public int x, y;
 
@@ -21,12 +19,6 @@ public class Position {
     }
 
     public boolean isOnLeft(Position pos) {
-        /*System.out.println(x + "," + y + "---" + pos.x + "," + pos.y);
-        System.out.println(((x - 1 == pos.x && y == pos.y) ||
-                (x - 1 == pos.x && y + 1 == pos.y) ||
-                (x - 1 == pos.x && y - 1 == pos.y)) + "," + (x - 1 == pos.x && y == pos.y) + "," +
-                (x - 1 == pos.x && y + 1 == pos.y) + "," +
-                (x - 1 == pos.x && y - 1 == pos.y));*/
         return (x - 1 == pos.x && y == pos.y) ||
                 (x - 1 == pos.x && y + 1 == pos.y) ||
                 (x - 1 == pos.x && y - 1 == pos.y);

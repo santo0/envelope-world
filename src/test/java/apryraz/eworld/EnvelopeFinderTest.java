@@ -40,9 +40,11 @@ public class EnvelopeFinderTest {
     public void testMakeSimpleStep(EnvelopeFinder eAgent,
                                    EFState targetState) throws
             IOException, ContradictionException, TimeoutException {
-        // Check (assert) whether the resulting state is equal to
-        //  the targetState after performing action runNextStep with bAgent
-
+        eAgent.runNextStep();
+        assertEquals(targetState, eAgent.efstate);
+        System.out.println("%%%%%% Expected efstate %%%%%%");
+        targetState.printState();
+        System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
     }
 
 
@@ -58,7 +60,6 @@ public class EnvelopeFinderTest {
         EFState efstate = new EFState(wDim);
         String row;
         String[] rowvalues;
-
         for (int i = wDim; i >= 1; i--) {
             row = br.readLine();
             rowvalues = row.split(" ");
@@ -116,9 +117,7 @@ public class EnvelopeFinderTest {
      *                      be the resulting states after each movement in fileSteps
      * @param fileEnvelopes
      **/
-    public void testMakeSeqOfSteps(int wDim,
-                                   int numSteps, String fileSteps, String fileStates,
-                                   String fileEnvelopes)
+    public void testMakeSeqOfSteps(int wDim, int numSteps, String fileSteps, String fileStates, String fileEnvelopes)
             throws IOException, ContradictionException, TimeoutException {
         // You should make TreasureFinder and TreasureWorldEnv objects to  test.
         // Then load sequence of target states, load sequence of steps into the eAgent
@@ -127,7 +126,8 @@ public class EnvelopeFinderTest {
         // load information about the World into the EnvAgent
         EnvelopeWorldEnv envAgent;
         // Load list of states
-        ArrayList<EFState> seqOfStates;
+        ArrayList<EFState> seqOfStates = loadListOfTargetStates(wDim, numSteps, fileStates);
+
         envAgent = new EnvelopeWorldEnv(wDim, fileEnvelopes);
         eAgent = new EnvelopeFinder(wDim, envAgent);
 
@@ -138,7 +138,11 @@ public class EnvelopeFinderTest {
 
         // Test here the sequence of steps and check the resulting states with the
         // ones in seqOfStates
+        for (int i = 0; i < numSteps; i++) {
+            testMakeSimpleStep(eAgent, seqOfStates.get(i));
+        }
     }
+
 
     /**
      * This is an example test. You must replicate this method for each different
@@ -148,7 +152,28 @@ public class EnvelopeFinderTest {
     public void TWorldTest1() throws
             IOException, ContradictionException, TimeoutException {
         // Example test for 4x4 world , Treasure at 3,3 and 5 steps
-        testMakeSeqOfSteps(4, 5, "tests/steps1.txt", "tests/states1.txt", "tests/envelopes1.txt");
+        testMakeSeqOfSteps(5, 5, "tests/steps1.txt", "tests/states1.txt", "tests/envelopes1.txt");
+    }
+
+    @Test
+    public void TWorldTest2() throws
+            IOException, ContradictionException, TimeoutException {
+        // Example test for 4x4 world , Treasure at 3,3 and 5 steps
+        testMakeSeqOfSteps(5, 7, "tests/steps2.txt", "tests/states2.txt", "tests/envelopes2.txt");
+    }
+
+    @Test
+    public void TWorldTest3() throws
+            IOException, ContradictionException, TimeoutException {
+        // Example test for 4x4 world , Treasure at 3,3 and 5 steps
+        testMakeSeqOfSteps(7, 6, "tests/steps3.txt", "tests/states3.txt", "tests/envelopes3.txt");
+    }
+
+    @Test
+    public void TWorldTest4() throws
+            IOException, ContradictionException, TimeoutException {
+        // Example test for 4x4 world , Treasure at 3,3 and 5 steps
+        testMakeSeqOfSteps(7, 12, "tests/steps4.txt", "tests/states4.txt", "tests/envelopes4.txt");
     }
 
 }
