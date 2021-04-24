@@ -38,7 +38,7 @@ public class EnvelopeWorld {
         EAgent = new EnvelopeFinder(wDim, EnvAgent);
 
         // save environment object into EAgent
-        //EAgent.setEnvironment(EnvAgent); //Ja el fico al constructor
+        //EAgent.setEnvironment(EnvAgent); //Environment setter in agent constructor
 
 
         // load list of steps into the Finder Agent

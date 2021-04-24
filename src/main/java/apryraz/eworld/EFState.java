@@ -14,7 +14,7 @@ public class EFState {
         initializeState();
     }
 
-    String getPositionState(int i, int j){
+    String getPositionState(int i, int j) {
         return matrix[i - 1][j - 1];
     }
 
@@ -29,9 +29,14 @@ public class EFState {
     /* i is the row, j the column
        we assume i and j are given in the range [1,wDim] */
     public void set(int i, int j, String val) {
-
-        matrix[i - 1][j - 1] = "\u001B[32m"+val+"\u001B[0m";
+        matrix[i - 1][j - 1] = val;
+    /*
+     *  matrix[i - 1][j - 1] = "\u001B[32m"+val+"\u001B[0m";
+     *
+     * Adds green color when position changes value.
+     */
     }
+
 
     public boolean equals(Object obj) {
         EFState efstate2 = (EFState) obj;
@@ -53,8 +58,6 @@ public class EFState {
             System.out.print("\t#\t");
             for (int j = 0; j < wDim; j++) {
                 System.out.print(matrix[i][j] + " ");
-//                System.out.print(matrix[i][j]+ "("+i+","+j+")" + " ");
-
             }
             System.out.println("\t#");
         }
