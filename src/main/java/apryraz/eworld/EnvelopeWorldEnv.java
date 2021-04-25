@@ -6,9 +6,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,7 +23,7 @@ public class EnvelopeWorldEnv {
     /**
      * envelopes locations
      */
-    Set<Position> envelopesLocations;   //Todo: Hauria d'implementar hash a Position?
+    Set<Position> envelopesLocations;
 
     /**
      * number of envelopes
@@ -47,7 +45,7 @@ public class EnvelopeWorldEnv {
     /**
      * Load the list of pirates locations
      *
-     * @param: name of the file that should contain a
+     * @param envelopeFile name of the file that should contain a
      * set of envelope locations in a single line.
      **/
     public void loadEnvelopeLocations(String envelopeFile) {
@@ -62,14 +60,16 @@ public class EnvelopeWorldEnv {
             System.out.println("MSG.   => Envelope locations file not found");
             exit(1);
         } catch (IOException ex) {
-            Logger.getLogger(EnvelopeWorldEnv.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(EnvelopeWorldEnv.class.getName()).log(Level.SEVERE,
+                                                                null, ex);
             exit(2);
         }
         positionList = locations.split(" ");
         envelopesLocations = new LinkedHashSet<>();
         for (String location : positionList) {
             String[] coords = location.split(",");
-            envelopesLocations.add(new Position(Integer.parseInt(coords[0]), Integer.parseInt(coords[1])));
+            envelopesLocations.add(new Position(Integer.parseInt(coords[0]),
+                                    Integer.parseInt(coords[1])));
         }
         numEnvelopes = envelopesLocations.size();
     }
@@ -92,14 +92,14 @@ public class EnvelopeWorldEnv {
             int ny = Integer.parseInt(msg.getComp(2));
 
             if (withinLimits(nx, ny)) {
-                ans = new AMessage("movedto", msg.getComp(1), msg.getComp(2), "");
+                ans = new AMessage("movedto",
+                                    msg.getComp(1),
+                                    msg.getComp(2), "");
             } else
-                ans = new AMessage("notmovedto", msg.getComp(1), msg.getComp(2), "");
-
+                ans = new AMessage("notmovedto",
+                                    msg.getComp(1),
+                                    msg.getComp(2), "");
         } else if (msg.getComp(0).equals("detectsat")) {
-            // YOU MUST ANSWER HERE TO THE OTHER MESSAGE TYPE:
-            //   ( "detectsat", "x" , "y", "" )
-            //
             StringBuilder readings = new StringBuilder();
             for (int i = 0; i < 5; i++) {
                 readings.append(0);
@@ -108,26 +108,30 @@ public class EnvelopeWorldEnv {
             int ny = Integer.parseInt(msg.getComp(2));
             Position givenPosition = new Position(nx, ny);
             for (Position envLoc : envelopesLocations) {
-                if (givenPosition.isOnRight(envLoc)) {
+                if (givenPosition.isOnTop(envLoc)) {
                     readings.replace(0, 1, "1");
                 }
-                if (givenPosition.isOnTop(envLoc)) {
+                if (givenPosition.isOnRight(envLoc)) {
                     readings.replace(1, 2, "1");
                 }
-                if (givenPosition.isOnLeft(envLoc)) {
+                if (givenPosition.isOnBot(envLoc)) {
                     readings.replace(2, 3, "1");
                 }
-                if (givenPosition.isOnBot(envLoc)) {
+                if (givenPosition.isOnLeft(envLoc)) {
                     readings.replace(3, 4, "1");
                 }
                 if (givenPosition.isOnSite(envLoc)) {
                     readings.replace(4, 5, "1");
                 }
-            }                //It will a message with three fields: DetectorValue x y
-            ans = new AMessage("detectsat", (msg.getComp(1)), (msg.getComp(2)), readings.toString());
+            }
+            ans = new AMessage("detectsat",
+                    (msg.getComp(1)),
+                    (msg.getComp(2)),
+                    readings.toString());//Answer: "detectsat", x, y, DetectorValue
             System.out.printf("ANS: %s\n", readings.toString());
         } else {
-            System.out.printf("ERROR: Unknown message type (%s)\n", msg.getComp(0));
+            System.out.printf("ERROR: Unknown message type (%s)\n",
+                                msg.getComp(0));
         }
         return ans;
     }
