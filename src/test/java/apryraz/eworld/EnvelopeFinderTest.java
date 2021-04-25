@@ -41,7 +41,7 @@ public class EnvelopeFinderTest {
                                    EFState targetState) throws
             IOException, ContradictionException, TimeoutException {
         eAgent.runNextStep();
-        assertEquals(targetState, eAgent.efstate);
+        assertEquals(targetState, eAgent.getState());
         System.out.println("%%%%%% Expected efstate %%%%%%");
         targetState.printState();
         System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
@@ -134,7 +134,6 @@ public class EnvelopeFinderTest {
 
         // Set environment agent and load list of steps into the finder agent
         eAgent.loadListOfSteps(numSteps, fileSteps);
-        eAgent.setEnvironment(envAgent);
 
         // Test here the sequence of steps and check the resulting states with the
         // ones in seqOfStates
@@ -144,10 +143,7 @@ public class EnvelopeFinderTest {
     }
 
 
-    /**
-     * This is an example test. You must replicate this method for each different
-     * test sequence, or use some kind of parametric tests with junit
-     **/
+
     @Test
     public void TWorldTest1() throws
             IOException, ContradictionException, TimeoutException {

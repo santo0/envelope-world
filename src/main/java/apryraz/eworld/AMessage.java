@@ -5,13 +5,13 @@ package apryraz.eworld;
  * World interface object
  **/
 public class AMessage {
-    /*
+    /**
      *  Array of String objects, that represent the different fields of each message
      *  So far, we assume a fixed pattern, with always three fields in any message:
      *  field0:  message type: moveto, movedto, notmovedto, detects at, yes/no ...
      *  field1:  first parameter of message
      *  field2:  second parameter of message
-     */
+     **/
     String[] msg;
 
     /**
@@ -39,7 +39,7 @@ public class AMessage {
     }
 
     /**
-     * get some part of the message
+     * Get some part of the message
      *
      * @param c index of the component to return
      * @return the String corresponding to the component requested

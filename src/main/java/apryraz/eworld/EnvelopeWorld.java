@@ -12,7 +12,7 @@ import org.sat4j.reader.*;
 
 
 /**
- * The class for the main program of the Barcenas World
+ * The class for the main program of the Envelope World
  **/
 public class EnvelopeWorld {
 
@@ -20,7 +20,7 @@ public class EnvelopeWorld {
     /**
      * This function should execute the sequence of steps stored in the file fileSteps,
      * but only up to numSteps steps. Each step must be executed with function
-     * runNextStep() of the BarcenasFinder agent.
+     * runNextStep() of the EnvelopeFinder agent.
      *
      * @param wDim          the dimension of world
      * @param numSteps      num of steps to perform
@@ -30,16 +30,12 @@ public class EnvelopeWorld {
     public static void runStepsSequence(int wDim,
                                         int numSteps, String fileSteps, String fileEnvelopes) throws
             IOException, ContradictionException, TimeoutException {
-        // Make instances of TreasureFinder agent and environment object classes
+        // Make instances of EnvelopeFinder agent and environment object classes
         EnvelopeFinder EAgent;
         EnvelopeWorldEnv EnvAgent;
 
         EnvAgent = new EnvelopeWorldEnv(wDim, fileEnvelopes);
         EAgent = new EnvelopeFinder(wDim, EnvAgent);
-
-        // save environment object into EAgent
-        //EAgent.setEnvironment(EnvAgent); //Environment setter in agent constructor
-
 
         // load list of steps into the Finder Agent
         EAgent.loadListOfSteps(numSteps, fileSteps);
@@ -54,9 +50,9 @@ public class EnvelopeWorld {
     /**
      * This function should load five arguments from the command line:
      * arg[0] = dimension of the word
-     * arg[3] = num of steps to perform
-     * arg[4] = file name with sequence of steps to perform
-     * arg[5] = file name with list of envelopes positions
+     * arg[1] = num of steps to perform
+     * arg[2] = file name with sequence of steps to perform
+     * arg[3] = file name with list of envelopes positions
      **/
     public static void main(String[] args) throws ParseFormatException,
             IOException, ContradictionException, TimeoutException, IllegalArgumentException {
