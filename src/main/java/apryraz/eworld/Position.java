@@ -1,12 +1,10 @@
 package apryraz.eworld;
 
 /**
- * class to control the position of EnvelopeWorldEnv
+ * class that represents a position of EnvelopeWolrdEnv.
  */
 public class Position {
-    /**
-     * Position of EnvelopeWorldEnv
-     **/
+
     public int x, y;
     /**
      * @param row row

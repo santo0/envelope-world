@@ -3,11 +3,9 @@ package apryraz.eworld;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.InvalidPathException;
+
 
 import org.sat4j.specs.*;
-import org.sat4j.minisat.*;
 import org.sat4j.reader.*;
 
 
@@ -26,9 +24,9 @@ public class EnvelopeWorld {
      * @param numSteps      num of steps to perform
      * @param fileSteps     file name with sequence of steps to perform
      * @param fileEnvelopes file name with sequence of steps to perform
-     * @throws IOException IoExeption error
+     * @throws IOException IoException error
      * @throws ContradictionException contradiction error
-     * @throws TimeoutException time out exeption
+     * @throws TimeoutException time out exception
      **/
     public static void runStepsSequence(int wDim,
                                         int numSteps, String fileSteps, String fileEnvelopes) throws
@@ -57,17 +55,17 @@ public class EnvelopeWorld {
      * arg[1] = num of steps to perform
      * arg[2] = file name with sequence of steps to perform
      * arg[3] = file name with list of envelopes positions
-     * @throws IOException IoExeption error
+     * @throws IOException IoException error
      * @throws ContradictionException contradiction error
-     * @throws TimeoutException time out exeption
-     * @throws ParseFormatException parseformat exeption
-     * @throws IllegalArgumentException illegal argument exeption
+     * @throws TimeoutException time out exception
+     * @throws ParseFormatException parseformat exception
+     * @throws IllegalArgumentException illegal argument exception
      **/
     public static void main(String[] args) throws ParseFormatException,
             IOException, ContradictionException, TimeoutException, IllegalArgumentException {
 
         if (args.length != 4) {
-            System.out.println("Usage: EnvelopeWorld wdim numSteps fileSteps fileEnvelopes");
+            System.err.println("Usage: EnvelopeWorld wdim numSteps fileSteps fileEnvelopes");
             throw new IllegalArgumentException(String.format("Expected 4 arguments. Given %d", args.length));
         }
         int wDim = getWDim(args[0]);
@@ -76,19 +74,19 @@ public class EnvelopeWorld {
         if (new File(args[2]).exists()) {
             fileSteps = args[2];
         } else {
-            System.out.printf("Path %s doesn't exist%n", args[2]);
+            System.err.printf("Path %s doesn't exist%n", args[2]);
             throw new IllegalArgumentException();
         }
         String fileEnvelopes;
         if (new File(args[2]).exists()) {
             fileEnvelopes = args[3];
         } else {
-            System.out.printf("Path %s doesn't exist%n", args[3]);
+            System.err.printf("Path %s doesn't exist%n", args[3]);
             throw new IllegalArgumentException();
         }
 
         // Here I run a concrete example, but you should read parameters from
-        // the command line, as decribed above.
+        // the command line, as described above.
         runStepsSequence(wDim, numSteps, fileSteps, fileEnvelopes);
     }
 
@@ -96,7 +94,7 @@ public class EnvelopeWorld {
      *
      * @param arg arguments
      * @return wdimension
-     * @throws IllegalArgumentException Illegal arguments
+     * @throws IllegalArgumentException
      */
 
     private static int getWDim(String arg) throws IllegalArgumentException {
@@ -113,7 +111,7 @@ public class EnvelopeWorld {
      *
      * @param arg args
      * @return numsteps
-     * @throws IllegalArgumentException illegal args
+     * @throws IllegalArgumentException
      */
 
     private static int getNumSteps(String arg) throws IllegalArgumentException {

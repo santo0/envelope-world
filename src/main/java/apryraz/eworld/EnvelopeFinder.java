@@ -22,10 +22,9 @@ import org.sat4j.minisat.*;
 
 
 /**
- * This agent performs a sequence of movements, and after each
- * movement it "senses" from the evironment the resulting position
- * and then the outcome from the smell sensor, to try to locate
- * the position of Envelope
+ * Class of the agent that finds envelopes.
+ * In this case, it tries to locate the positions where
+ * it certainly knows there won't be any envelopes.
  **/
 public class EnvelopeFinder {
 
@@ -109,7 +108,7 @@ public class EnvelopeFinder {
      *
      * @param WDim        the dimension of the Envelope World.
      * @param environment the environment agent.
-     * @throws IOException IoExeption error.
+     * @throws IOException IoException error.
      **/
     public EnvelopeFinder(int WDim, EnvelopeWorldEnv environment) throws IOException {
 
@@ -192,9 +191,10 @@ public class EnvelopeFinder {
      * original Envelope World, this would be to use the Smelll Sensor to get
      * a binary answer, and then to update the current state according to the
      * result of the logical inferences performed by the agent with its formula.
-     * @throws IOException IoExeption error
+     *
+     * @throws IOException            IoException error
      * @throws ContradictionException contradiction error
-     * @throws TimeoutException time out exeption
+     * @throws TimeoutException       time out exception
      **/
     public void runNextStep() throws
             IOException, ContradictionException, TimeoutException {
@@ -303,9 +303,9 @@ public class EnvelopeFinder {
      *            <p>
      *            DetectorValue must be a number that encodes all the valid readings
      *            of the sensor given the envelopes in the 3x3 square around (x,y)
-     * @throws IOException ioexption error
+     * @throws IOException            ioexption error
      * @throws ContradictionException contradiction error
-     * @throws TimeoutException time out exeption
+     * @throws TimeoutException       time out exception
      **/
     public void processDetectorSensorAnswer(AMessage ans) throws
             IOException, ContradictionException, TimeoutException {
@@ -336,18 +336,13 @@ public class EnvelopeFinder {
                             break;
                     }
                     solver.addClause(evidence);
-                } else if (reading == '1') {//Reading received
-                    /*
-                        In this case, the Envelope Finder is not interested
-                        when the sensor receives a reading.
-                     */
-                } else {
-                    System.out.printf("ERROR: Unknown code (%c)\n", reading);
+                } else if (reading != '1') {
+                    System.err.printf("ERROR: Unknown code (%c)\n", reading);
                     exit(1);
                 }
             }
         } else {
-            System.out.printf("ERROR: Unknown message type (%s)\n", ans.getComp(0));
+            System.err.printf("ERROR: Unknown message type (%s)\n", ans.getComp(0));
             exit(1);
         }
     }
@@ -357,9 +352,10 @@ public class EnvelopeFinder {
      * This function should add all the clauses stored in the list
      * futureToPast to the formula stored in solver.
      * Use the function addClause( VecInt ) to add each clause to the solver
-     * @throws IOException ioexption error
+     *
+     * @throws IOException            ioexption error
      * @throws ContradictionException contradiction error
-     * @throws TimeoutException time out exeption
+     * @throws TimeoutException       time out exception
      **/
     public void addLastFutureClausesToPastClauses() throws IOException,
             ContradictionException, TimeoutException {
@@ -383,9 +379,10 @@ public class EnvelopeFinder {
      * An efficient version of this function should try to not add to the futureToPast
      * conclusions that were already added in previous steps, although this will not produce
      * any bad functioning in the reasoning process with the formula.
-     * @throws IOException ioexption error
+     *
+     * @throws IOException            ioexption error
      * @throws ContradictionException contradiction error
-     * @throws TimeoutException time out exeption
+     * @throws TimeoutException       time out exception
      **/
     public void performInferenceQuestions() throws IOException,
             ContradictionException, TimeoutException {
@@ -413,11 +410,10 @@ public class EnvelopeFinder {
      * into the solver object.
      *
      * @return returns the solver object where the formula has been stored
-     * @throws IOException ioexption error
-     * @throws ContradictionException contradiction error
-     * @throws UnsupportedEncodingException Unsuported coding exeption
-     * @throws FileNotFoundException File not found
-     *
+     * @throws IOException                  ioexption error
+     * @throws ContradictionException       contradiction error
+     * @throws UnsupportedEncodingException Unsuported coding exception
+     * @throws FileNotFoundException        File not found
      **/
     public ISolver buildGamma() throws UnsupportedEncodingException,
             FileNotFoundException, IOException, ContradictionException {
