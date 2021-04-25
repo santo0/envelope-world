@@ -1,7 +1,7 @@
 package apryraz.eworld;
 
 /**
- * class that represents a position of EnvelopeWolrdEnv.
+ * Class that represents a position of EnvelopeWolrdEnv.
  */
 public class Position {
 
