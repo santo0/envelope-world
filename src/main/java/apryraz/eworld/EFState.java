@@ -1,13 +1,10 @@
 package apryraz.eworld;
 
 /**
- * Class that represents the world
+ * Class that represents the state of the Envelope Finder.
+ * What the agent knows about the world.
  **/
 public class EFState {
-    /**
-     * State of the Envelope Finder.
-     * What the agent knows about the world.
-     **/
 
     int wDim;
     String[][] matrix;
@@ -24,7 +21,7 @@ public class EFState {
     }
 
     /**
-     * Given a coordenate, get its corresponding state.
+     * Given a coordinate, get its corresponding state.
      *
      * @param i X-axis position (row).
      * @param j Y-axis position (column).

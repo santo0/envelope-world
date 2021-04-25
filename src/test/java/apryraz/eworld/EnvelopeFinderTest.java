@@ -36,18 +36,15 @@ public class EnvelopeFinderTest {
      * @param eAgent      EnvelopeFinder agent
      * @param targetState the state that should be equal to the resulting state of
      *                    the agent after performing the next step
-     * @throws IOException IoExeption error
+     * @throws IOException            IoException error
      * @throws ContradictionException contradiction error
-     * @throws TimeoutException time out exeption
+     * @throws TimeoutException       time out exception
      **/
     public void testMakeSimpleStep(EnvelopeFinder eAgent,
                                    EFState targetState) throws
             IOException, ContradictionException, TimeoutException {
         eAgent.runNextStep();
         assertEquals(targetState, eAgent.getState());
-        System.out.println("%%%%%% Expected efstate %%%%%%");
-        targetState.printState();
-        System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
     }
 
 
@@ -98,7 +95,7 @@ public class EnvelopeFinderTest {
             }
             br.close();
         } catch (FileNotFoundException ex) {
-            System.out.println("MSG.   => States file not found");
+            System.err.println("MSG.   => States file not found");
             exit(1);
         } catch (IOException ex) {
             Logger.getLogger(EnvelopeFinderTest.class.getName()).log(Level.SEVERE, null, ex);
@@ -118,16 +115,13 @@ public class EnvelopeFinderTest {
      * @param fileSteps     file name with sequence of steps to perform
      * @param fileStates    file name with sequence of target states, that should
      *                      be the resulting states after each movement in fileSteps
-     * @param fileEnvelopes
-     * @throws IOException IoExeption error
+     * @param fileEnvelopes file name with the position of the envelopes
+     * @throws IOException            IoException error
      * @throws ContradictionException contradiction error
-     * @throws TimeoutException time out exeption
+     * @throws TimeoutException       time out exception
      **/
     public void testMakeSeqOfSteps(int wDim, int numSteps, String fileSteps, String fileStates, String fileEnvelopes)
             throws IOException, ContradictionException, TimeoutException {
-        // You should make TreasureFinder and TreasureWorldEnv objects to  test.
-        // Then load sequence of target states, load sequence of steps into the eAgent
-        // and then test the sequence calling testMakeSimpleStep once for each step.
         EnvelopeFinder eAgent;
         // load information about the World into the EnvAgent
         EnvelopeWorldEnv envAgent;
@@ -149,32 +143,31 @@ public class EnvelopeFinderTest {
     }
 
 
-
     @Test
     public void TWorldTest1() throws
             IOException, ContradictionException, TimeoutException {
-        // Example test for 4x4 world , Treasure at 3,3 and 5 steps
+        // Example test for 5x5 world,  5 steps ,  envelopes at  2,2 4,4
         testMakeSeqOfSteps(5, 5, "tests/steps1.txt", "tests/states1.txt", "tests/envelopes1.txt");
     }
 
     @Test
     public void TWorldTest2() throws
             IOException, ContradictionException, TimeoutException {
-        // Example test for 4x4 world , Treasure at 3,3 and 5 steps
+        // Example test for 5x5 world,  7 steps , envolepes at  3,2 3,4
         testMakeSeqOfSteps(5, 7, "tests/steps2.txt", "tests/states2.txt", "tests/envelopes2.txt");
     }
 
     @Test
     public void TWorldTest3() throws
             IOException, ContradictionException, TimeoutException {
-        // Example test for 4x4 world , Treasure at 3,3 and 5 steps
+        // Example test for 7x7 world,  6 steps,  envelopes at  3,2 4,4 2,6
         testMakeSeqOfSteps(7, 6, "tests/steps3.txt", "tests/states3.txt", "tests/envelopes3.txt");
     }
 
     @Test
     public void TWorldTest4() throws
             IOException, ContradictionException, TimeoutException {
-        // Example test for 4x4 world , Treasure at 3,3 and 5 steps
+        // Example test for 7x7 world,  12 steps , envelopes at  6,2 4,4 2,6
         testMakeSeqOfSteps(7, 12, "tests/steps4.txt", "tests/states4.txt", "tests/envelopes4.txt");
     }
 

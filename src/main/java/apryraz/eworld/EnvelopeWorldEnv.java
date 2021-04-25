@@ -14,7 +14,7 @@ import java.util.logging.Logger;
 import static java.lang.System.exit;
 
 /**
- * class for the agent that controls the world
+ * Class of the agent that represents the environment/world.
  */
 
 public class EnvelopeWorldEnv {
@@ -133,7 +133,7 @@ public class EnvelopeWorldEnv {
                     readings.toString());//Answer: "detectsat", x, y, DetectorValue
             System.out.printf("ANS: %s\n", readings.toString());
         } else {
-            System.out.printf("ERROR: Unknown message type (%s)\n",
+            System.err.printf("ERROR: Unknown message type (%s)\n",
                                 msg.getComp(0));
         }
         return ans;
