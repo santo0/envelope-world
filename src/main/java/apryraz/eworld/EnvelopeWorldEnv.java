@@ -13,6 +13,9 @@ import java.util.logging.Logger;
 
 import static java.lang.System.exit;
 
+/**
+ * class for the agent that controls the world
+ */
 
 public class EnvelopeWorldEnv {
     /**

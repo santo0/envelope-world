@@ -1,5 +1,8 @@
 package apryraz.eworld;
 
+/**
+ * Class that represents the world
+ **/
 public class EFState {
     /**
      * State of the Envelope Finder.

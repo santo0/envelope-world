@@ -36,6 +36,9 @@ public class EnvelopeFinderTest {
      * @param eAgent      EnvelopeFinder agent
      * @param targetState the state that should be equal to the resulting state of
      *                    the agent after performing the next step
+     * @throws IOException IoExeption error
+     * @throws ContradictionException contradiction error
+     * @throws TimeoutException time out exeption
      **/
     public void testMakeSimpleStep(EnvelopeFinder eAgent,
                                    EFState targetState) throws
@@ -116,6 +119,9 @@ public class EnvelopeFinderTest {
      * @param fileStates    file name with sequence of target states, that should
      *                      be the resulting states after each movement in fileSteps
      * @param fileEnvelopes
+     * @throws IOException IoExeption error
+     * @throws ContradictionException contradiction error
+     * @throws TimeoutException time out exeption
      **/
     public void testMakeSeqOfSteps(int wDim, int numSteps, String fileSteps, String fileStates, String fileEnvelopes)
             throws IOException, ContradictionException, TimeoutException {

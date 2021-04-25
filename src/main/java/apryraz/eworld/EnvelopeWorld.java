@@ -26,6 +26,9 @@ public class EnvelopeWorld {
      * @param numSteps      num of steps to perform
      * @param fileSteps     file name with sequence of steps to perform
      * @param fileEnvelopes file name with sequence of steps to perform
+     * @throws IOException IoExeption error
+     * @throws ContradictionException contradiction error
+     * @throws TimeoutException time out exeption
      **/
     public static void runStepsSequence(int wDim,
                                         int numSteps, String fileSteps, String fileEnvelopes) throws
@@ -49,10 +52,16 @@ public class EnvelopeWorld {
 
     /**
      * This function should load five arguments from the command line:
+     * @param args ...
      * arg[0] = dimension of the word
      * arg[1] = num of steps to perform
      * arg[2] = file name with sequence of steps to perform
      * arg[3] = file name with list of envelopes positions
+     * @throws IOException IoExeption error
+     * @throws ContradictionException contradiction error
+     * @throws TimeoutException time out exeption
+     * @throws ParseFormatException parseformat exeption
+     * @throws IllegalArgumentException illegal argument exeption
      **/
     public static void main(String[] args) throws ParseFormatException,
             IOException, ContradictionException, TimeoutException, IllegalArgumentException {
@@ -83,6 +92,13 @@ public class EnvelopeWorld {
         runStepsSequence(wDim, numSteps, fileSteps, fileEnvelopes);
     }
 
+    /**
+     *
+     * @param arg arguments
+     * @return wdimension
+     * @throws IllegalArgumentException Illegal arguments
+     */
+
     private static int getWDim(String arg) throws IllegalArgumentException {
         int wDim;
         try {
@@ -92,6 +108,13 @@ public class EnvelopeWorld {
         }
         return wDim;
     }
+
+    /**
+     *
+     * @param arg args
+     * @return numsteps
+     * @throws IllegalArgumentException illegal args
+     */
 
     private static int getNumSteps(String arg) throws IllegalArgumentException {
         int numSteps;

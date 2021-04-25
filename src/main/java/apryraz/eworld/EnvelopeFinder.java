@@ -109,6 +109,7 @@ public class EnvelopeFinder {
      *
      * @param WDim        the dimension of the Envelope World.
      * @param environment the environment agent.
+     * @throws IOException IoExeption error.
      **/
     public EnvelopeFinder(int WDim, EnvelopeWorldEnv environment) throws IOException {
 
@@ -191,6 +192,9 @@ public class EnvelopeFinder {
      * original Envelope World, this would be to use the Smelll Sensor to get
      * a binary answer, and then to update the current state according to the
      * result of the logical inferences performed by the agent with its formula.
+     * @throws IOException IoExeption error
+     * @throws ContradictionException contradiction error
+     * @throws TimeoutException time out exeption
      **/
     public void runNextStep() throws
             IOException, ContradictionException, TimeoutException {
@@ -299,6 +303,9 @@ public class EnvelopeFinder {
      *            <p>
      *            DetectorValue must be a number that encodes all the valid readings
      *            of the sensor given the envelopes in the 3x3 square around (x,y)
+     * @throws IOException ioexption error
+     * @throws ContradictionException contradiction error
+     * @throws TimeoutException time out exeption
      **/
     public void processDetectorSensorAnswer(AMessage ans) throws
             IOException, ContradictionException, TimeoutException {
@@ -350,6 +357,9 @@ public class EnvelopeFinder {
      * This function should add all the clauses stored in the list
      * futureToPast to the formula stored in solver.
      * Use the function addClause( VecInt ) to add each clause to the solver
+     * @throws IOException ioexption error
+     * @throws ContradictionException contradiction error
+     * @throws TimeoutException time out exeption
      **/
     public void addLastFutureClausesToPastClauses() throws IOException,
             ContradictionException, TimeoutException {
@@ -373,6 +383,9 @@ public class EnvelopeFinder {
      * An efficient version of this function should try to not add to the futureToPast
      * conclusions that were already added in previous steps, although this will not produce
      * any bad functioning in the reasoning process with the formula.
+     * @throws IOException ioexption error
+     * @throws ContradictionException contradiction error
+     * @throws TimeoutException time out exeption
      **/
     public void performInferenceQuestions() throws IOException,
             ContradictionException, TimeoutException {
@@ -400,6 +413,11 @@ public class EnvelopeFinder {
      * into the solver object.
      *
      * @return returns the solver object where the formula has been stored
+     * @throws IOException ioexption error
+     * @throws ContradictionException contradiction error
+     * @throws UnsupportedEncodingException Unsuported coding exeption
+     * @throws FileNotFoundException File not found
+     *
      **/
     public ISolver buildGamma() throws UnsupportedEncodingException,
             FileNotFoundException, IOException, ContradictionException {
