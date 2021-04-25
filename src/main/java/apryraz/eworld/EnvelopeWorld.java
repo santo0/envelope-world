@@ -10,7 +10,7 @@ import org.sat4j.reader.*;
 
 
 /**
- * The class for the main program of the Envelope World
+ * Class for the main program of the Envelope World
  **/
 public class EnvelopeWorld {
 
@@ -85,8 +85,6 @@ public class EnvelopeWorld {
             throw new IllegalArgumentException();
         }
 
-        // Here I run a concrete example, but you should read parameters from
-        // the command line, as described above.
         runStepsSequence(wDim, numSteps, fileSteps, fileEnvelopes);
     }
 
