@@ -41,7 +41,8 @@ public class EnvelopeFinder {
      * Array of clauses that represent conclusiones obtained in the last
      * call to the inference function, but rewritten using the "past" variables
      **/
-    ArrayList<VecInt> futureToPast = null;
+    ArrayList<VecInt> futureToPast = new ArrayList<>();
+    ;
     /**
      * the current state of knowledge of the agent (what he knows about
      * every position of the world)
@@ -335,7 +336,9 @@ public class EnvelopeFinder {
                             evidence.insertFirst(-coordToLineal(x, y, ReadFiveOffset));
                             break;
                     }
-                    solver.addClause(evidence);
+                    if (evidence.size() != 0) {
+                        solver.addClause(evidence);
+                    }
                 } else if (reading != '1') {
                     System.err.printf("ERROR: Unknown code (%c)\n", reading);
                     exit(1);
@@ -359,11 +362,10 @@ public class EnvelopeFinder {
      **/
     public void addLastFutureClausesToPastClauses() throws IOException,
             ContradictionException, TimeoutException {
-        if (futureToPast != null) {
-            for (VecInt clause : futureToPast) {
-                solver.addClause(clause); //Added conclusions to the solver.
-            }
+        for (VecInt clause : futureToPast) {
+            solver.addClause(clause); //Added conclusions to the solver.
         }
+
         futureToPast = new ArrayList<>(); //Reset future conclusions.
 
     }
@@ -603,7 +605,7 @@ public class EnvelopeFinder {
      */
     void pastToFuture() throws ContradictionException {
         VecInt impClause;
-        for (int i = 0; i < WorldLinealDim; i++) {//nxn
+        for (int i = 0; i < WorldLinealDim; i++) {
             impClause = new VecInt();
             impClause.insertFirst(i + EnvelopePastOffset);
             impClause.insertFirst(-(i + EnvelopeFutureOffset));
