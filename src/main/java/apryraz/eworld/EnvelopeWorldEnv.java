@@ -49,7 +49,7 @@ public class EnvelopeWorldEnv {
      * Load the list of pirates locations
      *
      * @param envelopeFile name of the file that should contain a
-     * set of envelope locations in a single line.
+     *                     set of envelope locations in a single line.
      **/
     public void loadEnvelopeLocations(String envelopeFile) {
         String[] positionList;
@@ -64,7 +64,7 @@ public class EnvelopeWorldEnv {
             exit(1);
         } catch (IOException ex) {
             Logger.getLogger(EnvelopeWorldEnv.class.getName()).log(Level.SEVERE,
-                                                                null, ex);
+                    null, ex);
             exit(2);
         }
         positionList = locations.split(" ");
@@ -72,7 +72,7 @@ public class EnvelopeWorldEnv {
         for (String location : positionList) {
             String[] coords = location.split(",");
             envelopesLocations.add(new Position(Integer.parseInt(coords[0]),
-                                    Integer.parseInt(coords[1])));
+                    Integer.parseInt(coords[1])));
         }
         numEnvelopes = envelopesLocations.size();
     }
@@ -81,7 +81,7 @@ public class EnvelopeWorldEnv {
     /**
      * Process a message received by the EFinder agent,
      * by returning an appropriate answer
-     * It should answer to moveto and detectsat messages
+     * It answerS to moveto and detectsat messages
      *
      * @param msg message sent by the Agent
      * @return a msg with the answer to return to the agent
@@ -96,47 +96,63 @@ public class EnvelopeWorldEnv {
 
             if (withinLimits(nx, ny)) {
                 ans = new AMessage("movedto",
-                                    msg.getComp(1),
-                                    msg.getComp(2), "");
+                        msg.getComp(1),
+                        msg.getComp(2), "");
             } else
                 ans = new AMessage("notmovedto",
-                                    msg.getComp(1),
-                                    msg.getComp(2), "");
+                        msg.getComp(1),
+                        msg.getComp(2), "");
         } else if (msg.getComp(0).equals("detectsat")) {
-            StringBuilder readings = new StringBuilder();
-            for (int i = 0; i < 5; i++) {
-                readings.append(0);
-            }
-            int nx = Integer.parseInt(msg.getComp(1));
-            int ny = Integer.parseInt(msg.getComp(2));
-            Position givenPosition = new Position(nx, ny);
-            for (Position envLoc : envelopesLocations) {
-                if (givenPosition.isOnTop(envLoc)) {
-                    readings.replace(0, 1, "1");
-                }
-                if (givenPosition.isOnRight(envLoc)) {
-                    readings.replace(1, 2, "1");
-                }
-                if (givenPosition.isOnBot(envLoc)) {
-                    readings.replace(2, 3, "1");
-                }
-                if (givenPosition.isOnLeft(envLoc)) {
-                    readings.replace(3, 4, "1");
-                }
-                if (givenPosition.isOnSite(envLoc)) {
-                    readings.replace(4, 5, "1");
-                }
-            }
-            ans = new AMessage("detectsat",
-                    (msg.getComp(1)),
-                    (msg.getComp(2)),
-                    readings.toString());//Answer: "detectsat", x, y, DetectorValue
-            System.out.printf("ANS: %s\n", readings.toString());
+            int x = Integer.parseInt(msg.getComp(1));
+            int y = Integer.parseInt(msg.getComp(2));
+            Position currentPos = new Position(x, y);
+            ans = getPositionReadings(currentPos);
         } else {
             System.err.printf("ERROR: Unknown message type (%s)\n",
-                                msg.getComp(0));
+                    msg.getComp(0));
         }
         return ans;
+    }
+
+    /**
+     * Gets all the sensor readings given a position.
+     * The readings are returned in a binary codification.
+     * Example:
+     * -Only reading 1, then "10000".
+     * -Reading 3 and 5, then "00101".
+     * -All possible readings, then "11111".
+     * -No reading, then "00000".
+     *
+     * @param pos The position where the readings will be done.
+     * @return The answer message with the  readings codified in binary.
+     */
+    AMessage getPositionReadings(Position pos) {
+        StringBuilder readings = new StringBuilder();
+        for (int i = 0; i < 5; i++) {
+            readings.append(0);
+        }
+        for (Position envLoc : envelopesLocations) {
+            if (pos.isOnTop(envLoc)) {
+                readings.replace(0, 1, "1");
+            }
+            if (pos.isOnRight(envLoc)) {
+                readings.replace(1, 2, "1");
+            }
+            if (pos.isOnBot(envLoc)) {
+                readings.replace(2, 3, "1");
+            }
+            if (pos.isOnLeft(envLoc)) {
+                readings.replace(3, 4, "1");
+            }
+            if (pos.isOnSite(envLoc)) {
+                readings.replace(4, 5, "1");
+            }
+        }
+        //Answer: "detectsat", x, y, DetectorValue
+        return new AMessage("detectsat",
+                Integer.toString(pos.x),
+                Integer.toString(pos.y),
+                readings.toString());
     }
 
 
